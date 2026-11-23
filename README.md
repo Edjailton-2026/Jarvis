@@ -40,6 +40,20 @@ language.
 
 ---
 
+## Windows
+
+Use **PowerShell** or **Windows Terminal** from inside the project folder:
+
+```powershell
+winget install OpenJS.NodeJS.LTS          # Node.js 20 or newer
+npm install -g @anthropic-ai/claude-code  # then run `claude` once and log in
+npm install
+npm run setup
+npm start
+```
+
+Then open **http://localhost:5173** in Chrome or Edge.
+
 ## Quick start
 
 First, install, then start it:
@@ -69,11 +83,8 @@ Terminal 2 — the face:
 npm run dev
 ```
 
-Then open the app in a **real Chrome or Edge window**:
-
-```bash
-open http://localhost:5173
-```
+Then open the app in a **real Chrome or Edge window**. Type this address in the
+address bar: **http://localhost:5173**
 
 Click **INITIALISE**, allow the microphone when asked, and say **"Hey Jarvis"**.
 

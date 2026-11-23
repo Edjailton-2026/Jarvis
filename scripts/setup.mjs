@@ -38,7 +38,12 @@ try {
 // --- Claude CLI on PATH ---------------------------------------------------
 let claudeFound = false;
 try {
-  const res = spawnSync('claude', ['--version'], { encoding: 'utf8', timeout: 10000 });
+  // On Windows the npm-installed CLI is claude.cmd, which only runs through a shell.
+  const res = spawnSync('claude', ['--version'], {
+    encoding: 'utf8',
+    timeout: 10000,
+    shell: process.platform === 'win32',
+  });
   if (res.status === 0 && res.stdout) {
     claudeFound = true;
     line(tick, `Claude CLI found: ${res.stdout.trim()}`);

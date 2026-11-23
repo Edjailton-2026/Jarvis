@@ -121,3 +121,18 @@ test('only the built-ins JARVIS uses are offered', () => {
   }
   assert.ok(builtinTools(true).includes('Bash'))
 })
+
+test('read-leading MCP names are judged by their whole words', () => {
+  // Plain reads that contain an effect word as a substring must run.
+  assert.equal(decideTool('mcp__social__list_posts'), true)
+  assert.equal(decideTool('mcp__social__get_post'), true)
+  assert.equal(decideTool('mcp__dev__get_typescript_info'), true)
+  assert.equal(decideTool('mcp__android__list_devices'), true)
+  // A read verb does not excuse an action word, however it is spelled.
+  assert.equal(decideTool('mcp__crm__get_or_create_contact'), false)
+  assert.equal(decideTool('mcp__crm__search_and_send_mail'), false)
+  assert.equal(decideTool('mcp__crm__getAndDeleteRecord'), false)
+  // Names without a read verb keep the substring rule.
+  assert.equal(decideTool('mcp__elevenlabs__make_outbound_call'), false)
+  assert.equal(decideTool('mcp__social__post_update'), false)
+})

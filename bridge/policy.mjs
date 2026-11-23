@@ -110,6 +110,33 @@ const EFFECTFUL_VERB =
   /(send|call|post|create|delete|remove|update|edit|write|install|launch|tap|swipe|press|type|buy|pay|charge|publish|deploy|outbound|download)/i
 
 /**
+ * Whole words that make a read-leading name an effect, used only for names that
+ * open with a read verb. The substring regex above is too blunt there: it sees
+ * `post` in `list_posts` and `type` in `get_typescript_info`, and withholds two
+ * plain reads. `post` and `type` are left out of this set because, as whole
+ * words after a read verb, they name the thing being read, not an action.
+ */
+const EFFECT_WORDS = new Set([
+  'send', 'call', 'create', 'delete', 'remove', 'update', 'edit', 'write',
+  'install', 'launch', 'tap', 'swipe', 'press', 'buy', 'pay', 'charge',
+  'publish', 'deploy', 'outbound', 'download',
+])
+
+/**
+ * Does a tool name, with the server stripped, change something?
+ *
+ * A name that does not open with a read verb keeps the substring rule, since
+ * `makeOutboundCall` has no separators to split on. A name that does is split
+ * into words, camelCase included, so `get_or_create_contact` still writes while
+ * `list_posts` and `get_typescript_info` read.
+ */
+function isEffectful(tool) {
+  if (!READ_VERB.test(tool)) return EFFECTFUL_VERB.test(tool)
+  const words = tool.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase().split(/[_-]/)
+  return words.some((word) => EFFECT_WORDS.has(word))
+}
+
+/**
  * Tools whose names trip the veto without deserving it.
  *
  * The veto reads verbs out of names, which is the right instinct and
@@ -154,7 +181,7 @@ export function decideTool(name, allowWrites = false) {
     if (server === 'jarvis_eyes') return true
 
     const tool = mcpToolOf(name)
-    if (EFFECTFUL_VERB.test(tool) && !VETO_EXEMPT.has(`${server}__${tool}`)) {
+    if (isEffectful(tool) && !VETO_EXEMPT.has(`${server}__${tool}`)) {
       return allowWrites
     }
     // The session tools this bridge is developed inside count as read-only too.
